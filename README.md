@@ -31,12 +31,12 @@ SELECT DISTINCT
     (REPLACE(STR(?collection), "^info:fedora/", "") AS ?parent)
 
 WHERE {
-  # --Filter objects ending with ':collection'
+  # Filter objects ending with ':collection'
   #?pid ?predicate ?object .
   ?pid rel:isMemberOfCollection ?collection .
   FILTER REGEX(STR(?pid), ":collection$")
  
-  # --Retrieve additional metadata
+  # Retrieve additional metadata
   OPTIONAL { ?pid fedora:label ?collection_name . }
   OPTIONAL { ?pid dc:description ?collection_Description. }
 }
