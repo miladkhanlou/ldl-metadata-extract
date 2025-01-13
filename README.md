@@ -172,7 +172,6 @@ WHERE {
 ```
 ## Step 4: Extract PDF and OBJ Data Streams
 **Objective:** Retrieve all PIDs with PDF and OBJ data streams within the collection.
-
 **Bash Script:**
 Run a script on the Fedora data stream storage location for the collection namespace. Specify the data stream type (PDF or OBJ).
 
@@ -225,6 +224,7 @@ Save the updated file as `collection_merged_metadata.csv`.
 **Expected Output:**
 A merged CSV containing all PIDs, their hierarchical relationships, and metadata for PDF and OBJ data streams:
 - `PID`, `content_model`, `title`, `parent_PID`, `filetype`, `file_size`, `file_path`, `mods_path`, `relzx_path`.
+Run `merge_and_process.py` to create final accounting as single output.
 
 ## Step 6: Post-Processing
 
