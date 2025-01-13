@@ -19,7 +19,6 @@
 4. **Merge and process (final accounting csv):** merge all PIDs csv (step2) with each csv containging datastream metadata and process the result to filter needed data stream metadata
     - `PID` of the collection
     - Collection `Content model`
-    - Collection `Description`
     - Collection `Title`
     - `PID` the object
     - `filetype`
