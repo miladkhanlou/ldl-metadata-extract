@@ -1,7 +1,37 @@
+# Overview of the pipeline:
+1- **Institution level data(Optional):** Extract Metadata of all Collections within LDL or Institution(e.g lsu)
+    - `PID` of the collection
+    - Collection `Content model`
+    - Collection `Description`
+    - Collection `Title`
+2- **Information on All content within Collection**: Extract comprehenisive information objects Within a Specific Collection
+    - `PID` of the collection
+    - PID's `Content model`
+    - PID's parent page(`parent_PID`)
+    - PID's `title`(title of the page).
+3- **Extract Datastream metadata within collcetion**
+    - `PID` the object
+    - `filetype`
+    - `file_size`
+    - `file_path`
+    - `mods_path`
+    - `rdf_path`
+4- **Merge and process (final accounting csv):** merge all PIDs csv (step2) with each csv containging datastream metadata and process the result to filter needed data stream metadata
+    - `PID` of the collection
+    - Collection `Content model`
+    - Collection `Description`
+    - Collection `Title`
+    - `PID` the object
+    - `filetype`
+    - `file_size`
+    - `file_path`
+    - `mods_path`
+    - `rdf_path`
+    
+---
 # Step-by-Step Instructions for Extracting, Processing, and Organizing Metadata from LDL Collections
-
-## Step 1: Extract Comprehensive Information About All Collections
-
+## Step 1: Optional:
+### 1.1 Extract Comprehensive Information About All Collections
 **Objective:** Retrieve information about all collections within the Louisiana Digital Library (LDL).
 **SPARQL Query:**
 Run a query to extract all collections within LDL. The query should include the following information for each collection:
@@ -41,7 +71,7 @@ WHERE {
   OPTIONAL { ?pid dc:description ?collection_Description. }
 }
 ```
-## Step 2: Extract Collections for a Specific Institution
+### Step 1.2: Extract Collections for a Specific Institution
 **Objective:** Retrieve collections specific to an institution namespace (e.g., LSU) with additional detailed information about the collection.
 
 **SPARQL Query:**
@@ -85,7 +115,7 @@ WHERE {
   OPTIONAL { ?pid dc:description ?collection_Description. }
 }
 ```
-## Step 3: Extract All PIDs Within a Specific Collection
+## Step 2: Extract comprehenisive information objects Within a Specific Collection
 **Objective:** Retrieve all PIDs within a specific collection, including hierarchical relationships.
 
 **SPARQL Query:**
@@ -170,7 +200,7 @@ WHERE {
   FILTER STRSTARTS(STR(?contentModel), "info:fedora/islandora:")
 }
 ```
-## Step 4: Extract PDF and OBJ Data Streams
+## Step 3: Extract PDF and OBJ Data Streams
 **Objective:** Retrieve all PIDs with PDF and OBJ data streams within the collection.
 **Bash Script:**
 Run a script on the Fedora data stream storage location for the collection namespace. Specify the data stream type (PDF or OBJ).
@@ -208,7 +238,7 @@ for dir in $(ls -d ../../datastreamStore/*); do
 done
 date
 ```
-## Step 5: Merge and Update Metadata
+## Step 4: Merge and Update Metadata
 
 **Objective:** Merge the `PDF` and `OBJ` data streams with the comprehensive PIDs metadata (`collection_all_pids.csv`).
 
@@ -226,7 +256,7 @@ A merged CSV containing all PIDs, their hierarchical relationships, and metadata
 - `PID`, `content_model`, `title`, `parent_PID`, `filetype`, `file_size`, `file_path`, `mods_path`, `relzx_path`.
 Run `merge_and_process.py` to create final accounting as single output.
 
-## Step 6: Post-Processing
+## Step 5: Post-Processing
 
 **Objective:** Clean and finalize the merged CSV to ensure only relevant data is retained and formatted correctly.
 
@@ -245,7 +275,7 @@ Save the final file as `collection_final_metadata.csv`.
 A cleaned and finalized CSV containing:
 - `PID`, `content_model`, `title`, `parent_PID`, `filetype`, `file_size (KB)`, `file_path`, `mods_path`, `relzx_path`.
 
-## Step 7: Save and Organize Files
+## Step 6: Save and Organize Files
 
 **Objective:** Save all outputs to a dedicated location for the collection.
 
