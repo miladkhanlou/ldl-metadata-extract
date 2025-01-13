@@ -158,7 +158,6 @@ WHERE {
 }
 ```
 ## Step 4: Extract PDF and OBJ Data Streams
-
 **Objective:** Retrieve all PIDs with PDF and OBJ data streams within the collection.
 
 **Bash Script:**
@@ -171,7 +170,32 @@ Save the output to separate CSVs:
 **Expected Output:**
 CSVs for PDF and OBJ data streams, including:
 - `PID`, `filetype`, `file_size`, `file_path`, `mods_path`, `relzx_path`.
+```sh
+#!/bin/bash
+date
+headers="PID,filetype,PDF Size,Institution,collection_name,PDF Path,MODS Path,RELS-EXT Path"
+echo -e $headers > "/tmp/outfiles/milad/louisiananewspapers-orleans-pdf.csv"
 
+for dir in $(ls -d ../../datastreamStore/*); do
+  echo $dir
+  for file in "$dir"/*louisiananewspapers-orleans*PDF*.0; do
+    if [[ -f "$file" ]]; then
+      echo $file
+      PID=$(echo -e "${file}" | sed 's/info%3Afedora%2F//g' |  grep -o "[a-zA-Z0-9-]*%3A[0-9a-zA-Z]*" | sed 's/%3A/:/g')
+      collection="$(echo $PID | cut -d ':' -f 1):collection"
+      institution=$(echo $PID | cut -d '-' -f 1)
+      filetype=$(file -b --mime-type "$file")
+      PDF_Size=$(stat --format="%s" "$file")
+      PDF_path="https://louisianadigitallibrary.org/islandora/object/${PID}/datastream/PDF/download"
+      mods_path="https://louisianadigitallibrary.org/islandora/object/${PID}/datastream/MODS/download"
+      relsext_path="https://louisianadigitallibrary.org/islandora/object/${PID}/datastream/RELS-EXT/download"
+      line="${PID},${filetype},${PDF_Size},${institution},${collection},${PDF_path},${mods_path},${relsext_path}"
+      echo -e $line >> "/tmp/outfiles/milad/louisiananewspapers-orleans-pdf.csv"
+    fi
+  done
+done
+date
+```
 ## Step 5: Merge and Update Metadata
 
 **Objective:** Merge the `PDF` and `OBJ` data streams with the comprehensive PIDs metadata (`collection_all_pids.csv`).
