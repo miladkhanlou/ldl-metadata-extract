@@ -3,7 +3,6 @@
 ## Step 1: Extract Comprehensive Information About All Collections
 
 **Objective:** Retrieve information about all collections within the Louisiana Digital Library (LDL).
-
 **SPARQL Query:**
 Run a query to extract all collections within LDL. The query should include the following information for each collection:
 - PID of the collection
@@ -17,9 +16,38 @@ Save the output to a CSV file named `all_collections.csv`.
 **Expected Output:**
 A CSV with all collections in LDL, containing:
 - `PID`, `content_model`, `description`, `contributor`, and `title`.
+```sparql
+PREFIX fedora: <info:fedora/fedora-system:def/model#>
+PREFIX view: <info:fedora/fedora-system:def/view#>
+PREFIX rel: <info:fedora/fedora-system:def/relations-external#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX premis: <http://www.loc.gov/premis/rdf/v1#>
 
+SELECT DISTINCT 
+    (REPLACE(STR(?pid), "^info:fedora/", "") AS ?PID)
+    ?collection_name
+    ?collection_Description
+    (STRAFTER(STR(?collection_pid), "info:fedora/islandora:") AS ?parent)
+
+    # (STRAFTER(STR(?contentModel), "info:fedora/islandora:") AS ?content_model)
+WHERE {
+  ?pid fedora:hasModel ?contentModel .
+  ?pid rel:isMemberOfCollection ?collection_pid .
+  
+  # Filter To get all collections
+  FILTER REGEX(STR(?contentModel), "fedora/islandora:collectionCModel")
+
+  # Filter for the desired namespace
+  FILTER REGEX(STR(?pid), "louisiananewspapers-")
+  
+  # Retrieve additional metadata
+  OPTIONAL { ?pid fedora:label ?collection_name . }
+  OPTIONAL { ?pid dc:description ?collection_Description. }
+}
+```
 ## Step 2: Extract Collections for a Specific Institution
-
 **Objective:** Retrieve collections specific to an institution namespace (e.g., LSU) with additional detailed information about the collection.
 
 **SPARQL Query:**
@@ -35,9 +63,36 @@ Save the output to `lsu_collections.csv`.
 **Expected Output:**
 A CSV with all collections under LSU, containing:
 - `PID`, `content_model`, `description`, `contributor`, and `title`.
+```sparql
+PREFIX fedora: <info:fedora/fedora-system:def/model#>
+PREFIX view: <info:fedora/fedora-system:def/view#>
+PREFIX rel: <info:fedora/fedora-system:def/relations-external#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX premis: <http://www.loc.gov/premis/rdf/v1#>
 
+SELECT DISTINCT 
+    (REPLACE(STR(?pid), "^info:fedora/", "") AS ?PID)
+    ?collection_name
+    ?collection_Description
+    (STRAFTER(STR(?collection_pid), "info:fedora/islandora:") AS ?parent)
+WHERE {
+  ?pid fedora:hasModel ?contentModel .
+  ?pid rel:isMemberOfCollection ?collection_pid .
+  
+  # Filter To get all collections
+  FILTER REGEX(STR(?contentModel), "fedora/islandora:collectionCModel")
+
+  # Filter for the desired namespace
+  FILTER REGEX(STR(?pid), "louisiananewspapers-")
+  
+  # Retrieve additional metadata
+  OPTIONAL { ?pid fedora:label ?collection_name . }
+  OPTIONAL { ?pid dc:description ?collection_Description. }
+}
+```
 ## Step 3: Extract All PIDs Within a Specific Collection
-
 **Objective:** Retrieve all PIDs within a specific collection, including hierarchical relationships.
 
 **SPARQL Query:**
@@ -55,7 +110,60 @@ Save the output to `collection_all_pids.csv`.
 **Expected Output:**
 A CSV with all PIDs in the collection, including hierarchical relationships and metadata:
 - `PID`, `content_model`, `parent_PID`, and `title`.
+```sparql
+PREFIX fedora: <info:fedora/fedora-system:def/model#>
+PREFIX view: <info:fedora/fedora-system:def/view#>
+PREFIX rel: <info:fedora/fedora-system:def/relations-external#>
+PREFIX dc: <http://purl.org/dc/elements/1.1>
+PREFIX dcterms: <http://purl.org/dc/terms>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX premis: <http://www.loc.gov/premis/rdf/v1#>
 
+SELECT DISTINCT 
+    (REPLACE(STR(?pid), "^info:fedora/", "") AS ?PID)
+    (STRAFTER(STR(?contentModel), "info:fedora/islandora:") AS ?content_model)
+WHERE {
+  # All members of collection(e.g largeImageCmodel, compoundObjects, compoundContentmodel)
+  {
+    # PIDs directly in the collection
+    ?pid rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+  }
+  UNION
+  {
+  # objects within a compound
+    ?pid rel:isConstituentOf ?compound .
+    ?compound rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+
+  }
+    UNION
+  {
+    # All members of compound (e.g Newspaper issues, )
+    ?pid rel:isMemberOf ?compound .
+    ?compound rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+  }
+  UNION
+  {
+    # all compound children of newspaperIssues (e.g newspaper content model)
+    ?pid rel:isMemberOf ?newspaperIssue .
+    ?newspaperIssue rel:isMemberOf ?compound .
+    ?compound rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+  }
+  UNION
+  {
+  # Objects within final newspaper content model (e.g Large_image_Cmodel)
+    ?pid rel:isConstituentOf ?compoundnewspaper .
+    ?compoundnewspaper rel:isMemberOf ?newspaperIssue .
+    ?newspaperIssue rel:isMemberOf ?compound .
+    ?compound rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+  }
+
+  # Get the content model for each PID
+  ?pid fedora:hasModel ?contentModel .
+
+  # Filter for valid content models
+  FILTER STRSTARTS(STR(?contentModel), "info:fedora/islandora:")
+}
+```
 ## Step 4: Extract PDF and OBJ Data Streams
 
 **Objective:** Retrieve all PIDs with PDF and OBJ data streams within the collection.
@@ -73,7 +181,7 @@ CSVs for PDF and OBJ data streams, including:
 
 ## Step 5: Merge and Update Metadata
 
-**Objective:** Merge the PDF and OBJ data streams with the comprehensive PIDs metadata (`collection_all_pids.csv`).
+**Objective:** Merge the `PDF` and `OBJ` data streams with the comprehensive PIDs metadata (`collection_all_pids.csv`).
 
 **Python Script:**
 Use the merge function in the Python script to:
