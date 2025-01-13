@@ -1,22 +1,22 @@
 # Overview of the pipeline:
-1- **Institution level data(Optional):** Extract Metadata of all Collections within LDL or Institution(e.g lsu)
+1. **Institution level data(Optional):** Extract Metadata of all Collections within LDL or Institution(e.g lsu)
     - `PID` of the collection
     - Collection `Content model`
     - Collection `Description`
     - Collection `Title`
-2- **Information on All content within Collection**: Extract comprehenisive information objects Within a Specific Collection
+2. **Information on All content within Collection**: Extract comprehenisive information objects Within a Specific Collection
     - `PID` of the collection
     - PID's `Content model`
     - PID's parent page(`parent_PID`)
     - PID's `title`(title of the page).
-3- **Extract Datastream metadata within collcetion**
+3. **Extract Datastream metadata within collcetion**
     - `PID` the object
     - `filetype`
     - `file_size`
     - `file_path`
     - `mods_path`
     - `rdf_path`
-4- **Merge and process (final accounting csv):** merge all PIDs csv (step2) with each csv containging datastream metadata and process the result to filter needed data stream metadata
+4. **Merge and process (final accounting csv):** merge all PIDs csv (step2) with each csv containging datastream metadata and process the result to filter needed data stream metadata
     - `PID` of the collection
     - Collection `Content model`
     - Collection `Description`
