@@ -6,9 +6,8 @@
 **SPARQL Query:**
 Run a query to extract all collections within LDL. The query should include the following information for each collection:
 - PID of the collection
-- Content model
-- Description
-- Contributor
+- Collection Content model
+- Collection Description
 - Title of the collection
 
 Save the output to a CSV file named `all_collections.csv`.
@@ -29,7 +28,6 @@ SELECT DISTINCT
     (REPLACE(STR(?pid), "^info:fedora/", "") AS ?PID)
     ?collection_name
     ?collection_Description
-    ?collection_Contributor
     (REPLACE(STR(?collection), "^info:fedora/", "") AS ?parent)
 
 
@@ -43,7 +41,6 @@ WHERE {
   # --Retrieve additional metadata
   OPTIONAL { ?pid fedora:label ?collection_name . }
   OPTIONAL { ?pid dc:description ?collection_Description. }
-  OPTIONAL { ?pid dc:contributor ?collection_Contributor . }
 }
 ```
 ## Step 2: Extract Collections for a Specific Institution
@@ -52,9 +49,8 @@ WHERE {
 **SPARQL Query:**
 Modify the previous query to filter by the institution namespace (e.g., LSU). Extract detailed information for each collection within the institution, including:
 - PID of the collection
-- Content model
-- Description
-- Contributor
+- Collection Content model
+- Collection Description
 - Title of the collection
 
 Save the output to `lsu_collections.csv`.
