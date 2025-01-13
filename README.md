@@ -17,10 +17,9 @@
     - `mods_path`
     - `rdf_path`
 4. **Merge and process (final accounting csv):** merge all PIDs csv (step2) with each csv containging datastream metadata and process the result to filter needed data stream metadata
-    - `PID` of the collection
+    - `PID`
     - Collection `Content model`
     - Collection `Title`
-    - `PID` the object
     - `filetype`
     - `file_size`
     - `file_path`
