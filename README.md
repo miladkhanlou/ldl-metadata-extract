@@ -30,8 +30,6 @@ SELECT DISTINCT
     ?collection_Description
     (REPLACE(STR(?collection), "^info:fedora/", "") AS ?parent)
 
-
-    # (STRAFTER(STR(?contentModel), "info:fedora/") AS ?content_model)
 WHERE {
   # --Filter objects ending with ':collection'
   #?pid ?predicate ?object .
