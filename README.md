@@ -29,22 +29,21 @@ SELECT DISTINCT
     (REPLACE(STR(?pid), "^info:fedora/", "") AS ?PID)
     ?collection_name
     ?collection_Description
-    (STRAFTER(STR(?collection_pid), "info:fedora/islandora:") AS ?parent)
+    ?collection_Contributor
+    (REPLACE(STR(?collection), "^info:fedora/", "") AS ?parent)
 
-    # (STRAFTER(STR(?contentModel), "info:fedora/islandora:") AS ?content_model)
+
+    # (STRAFTER(STR(?contentModel), "info:fedora/") AS ?content_model)
 WHERE {
-  ?pid fedora:hasModel ?contentModel .
-  ?pid rel:isMemberOfCollection ?collection_pid .
-  
-  # Filter To get all collections
-  FILTER REGEX(STR(?contentModel), "fedora/islandora:collectionCModel")
-
-  # Filter for the desired namespace
-  FILTER REGEX(STR(?pid), "louisiananewspapers-")
-  
-  # Retrieve additional metadata
+  # --Filter objects ending with ':collection'
+  #?pid ?predicate ?object .
+  ?pid rel:isMemberOfCollection ?collection .
+  FILTER REGEX(STR(?pid), ":collection$")
+ 
+  # --Retrieve additional metadata
   OPTIONAL { ?pid fedora:label ?collection_name . }
   OPTIONAL { ?pid dc:description ?collection_Description. }
+  OPTIONAL { ?pid dc:contributor ?collection_Contributor . }
 }
 ```
 ## Step 2: Extract Collections for a Specific Institution
