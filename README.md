@@ -107,7 +107,7 @@ A CSV with all PIDs in the collection, including hierarchical relationships and 
 PREFIX fedora: <info:fedora/fedora-system:def/model#>
 PREFIX view: <info:fedora/fedora-system:def/view#>
 PREFIX rel: <info:fedora/fedora-system:def/relations-external#>
-PREFIX dc: <http://purl.org/dc/elements/1.1>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX dcterms: <http://purl.org/dc/terms>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX premis: <http://www.loc.gov/premis/rdf/v1#>
@@ -115,45 +115,58 @@ PREFIX premis: <http://www.loc.gov/premis/rdf/v1#>
 SELECT DISTINCT 
     (REPLACE(STR(?pid), "^info:fedora/", "") AS ?PID)
     (STRAFTER(STR(?contentModel), "info:fedora/islandora:") AS ?content_model)
+    ?title
+    (REPLACE(STR(?parent_pid), "^info:fedora/", "") AS ?parent_PID)
 WHERE {
-  # All members of collection(e.g largeImageCmodel, compoundObjects, compoundContentmodel)
   {
     # PIDs directly in the collection
     ?pid rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+    OPTIONAL { ?pid fedora:label ?title . }
+    OPTIONAL { ?pid fedora:hasModel ?contentModel . }
+    BIND(<info:fedora/louisiananewspapers-orleans:collection> AS ?parent_pid)
   }
   UNION
   {
-  # objects within a compound
-    ?pid rel:isConstituentOf ?compound .
-    ?compound rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
-
-  }
-    UNION
-  {
-    # All members of compound (e.g Newspaper issues, )
+    # Children of compounds in the collection
     ?pid rel:isMemberOf ?compound .
     ?compound rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+    OPTIONAL { ?pid fedora:label ?title . }
+    OPTIONAL { ?pid fedora:hasModel ?contentModel . }
+    BIND(?compound AS ?parent_pid)
   }
   UNION
   {
-    # all compound children of newspaperIssues (e.g newspaper content model)
+    # Objects within compounds
+    ?pid rel:isConstituentOf ?compound .
+    ?compound rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+    OPTIONAL { ?pid fedora:label ?title . }
+    OPTIONAL { ?pid fedora:hasModel ?contentModel . }
+    BIND(?compound AS ?parent_pid)
+  }
+  UNION
+  {
+    # Newspaper content models within issues
     ?pid rel:isMemberOf ?newspaperIssue .
     ?newspaperIssue rel:isMemberOf ?compound .
     ?compound rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+    OPTIONAL { ?pid fedora:label ?title . }
+    OPTIONAL { ?pid fedora:hasModel ?contentModel . }
+    BIND(?newspaperIssue AS ?parent_pid)
   }
   UNION
   {
-  # Objects within final newspaper content model (e.g Large_image_Cmodel)
+    # Objects within final newspaper content model
     ?pid rel:isConstituentOf ?compoundnewspaper .
     ?compoundnewspaper rel:isMemberOf ?newspaperIssue .
     ?newspaperIssue rel:isMemberOf ?compound .
     ?compound rel:isMemberOfCollection <info:fedora/louisiananewspapers-orleans:collection> .
+    OPTIONAL { ?pid fedora:label ?title . }
+    OPTIONAL {
+      ?pid fedora:hasModel ?contentModel .
+      FILTER STRSTARTS(STR(?contentModel), "info:fedora/islandora:")  
+    }
+    BIND(?compoundnewspaper AS ?parent_pid)
   }
-
-  # Get the content model for each PID
-  ?pid fedora:hasModel ?contentModel .
-
-  # Filter for valid content models
   FILTER STRSTARTS(STR(?contentModel), "info:fedora/islandora:")
 }
 ```
