@@ -1,10 +1,10 @@
 # Overview of the pipeline:
-1. **Institution level data(Optional):** Extract Metadata of all Collections within LDL or Institution(e.g lsu)
+1. **Institution and Collection level data(Optional):** Extract Metadata of all Collections within LDL or Institution(e.g lsu)
     - `PID` of the collection
     - Collection `Content model`
     - Collection `Description`
     - Collection `Title`
-2. **Information on All content within Collection**: Extract comprehenisive information objects Within a Specific Collection
+2. **Information of All content within Collection**: Extract comprehenisive information objects Within a Specific Collection
     - `PID` of the collection
     - PID's `Content model`
     - PID's parent page(`parent_PID`)
@@ -28,92 +28,7 @@
     
 ---
 # Step-by-Step Instructions for Extracting, Processing, and Organizing Metadata from LDL Collections
-## Step 1: Optional:
-### 1.1 Extract Comprehensive Information About All Collections
-**Objective:** Retrieve information about all collections within the Louisiana Digital Library (LDL).
-**SPARQL Query:**
-Run a query to extract all collections within LDL. The query should include the following information for each collection:
-- PID of the collection
-- Collection Content model
-- Collection Description
-- Title of the collection
-
-Save the output to a CSV file named `all_collections.csv`.
-
-**Expected Output:**
-A CSV with all collections in LDL, containing:
-- `PID`, `content_model`, `description`, `contributor`, and `title`.
-```sparql
-PREFIX fedora: <info:fedora/fedora-system:def/model#>
-PREFIX view: <info:fedora/fedora-system:def/view#>
-PREFIX rel: <info:fedora/fedora-system:def/relations-external#>
-PREFIX dc: <http://purl.org/dc/elements/1.1/>
-PREFIX dcterms: <http://purl.org/dc/terms>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX premis: <http://www.loc.gov/premis/rdf/v1#>
-
-SELECT DISTINCT 
-    (REPLACE(STR(?pid), "^info:fedora/", "") AS ?PID)
-    ?collection_name
-    ?collection_Description
-    (REPLACE(STR(?collection), "^info:fedora/", "") AS ?parent)
-
-WHERE {
-  # Filter objects ending with ':collection'
-  #?pid ?predicate ?object .
-  ?pid rel:isMemberOfCollection ?collection .
-  FILTER REGEX(STR(?pid), ":collection$")
- 
-  # Retrieve additional metadata
-  OPTIONAL { ?pid fedora:label ?collection_name . }
-  OPTIONAL { ?pid dc:description ?collection_Description. }
-}
-```
-### Step 1.2: Extract Collections for a Specific Institution
-**Objective:** Retrieve collections specific to an institution namespace (e.g., LSU) with additional detailed information about the collection.
-
-**SPARQL Query:**
-Modify the previous query to filter by the institution namespace (e.g., LSU). Extract detailed information for each collection within the institution, including:
-- PID of the collection
-- Collection Content model
-- Collection Description
-- Title of the collection
-
-Save the output to `lsu_collections.csv`.
-
-**Expected Output:**
-A CSV with all collections under LSU, containing:
-- `PID`, `content_model`, `description`, `contributor`, and `title`.
-```sparql
-PREFIX fedora: <info:fedora/fedora-system:def/model#>
-PREFIX view: <info:fedora/fedora-system:def/view#>
-PREFIX rel: <info:fedora/fedora-system:def/relations-external#>
-PREFIX dc: <http://purl.org/dc/elements/1.1/>
-PREFIX dcterms: <http://purl.org/dc/terms>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX premis: <http://www.loc.gov/premis/rdf/v1#>
-
-SELECT DISTINCT 
-    (REPLACE(STR(?pid), "^info:fedora/", "") AS ?PID)
-    ?collection_name
-    ?collection_Description
-    (STRAFTER(STR(?collection_pid), "info:fedora/islandora:") AS ?parent)
-WHERE {
-  ?pid fedora:hasModel ?contentModel .
-  ?pid rel:isMemberOfCollection ?collection_pid .
-  
-  # Filter To get all collections
-  FILTER REGEX(STR(?contentModel), "fedora/islandora:collectionCModel")
-
-  # Filter for the desired namespace
-  FILTER REGEX(STR(?pid), "louisiananewspapers-")
-  
-  # Retrieve additional metadata
-  OPTIONAL { ?pid fedora:label ?collection_name . }
-  OPTIONAL { ?pid dc:description ?collection_Description. }
-}
-```
-## Step 2: Extract comprehenisive information objects Within a Specific Collection
+## Step 1: Extract comprehenisive information objects Within a Specific Collection
 **Objective:** Retrieve all PIDs within a specific collection, including hierarchical relationships.
 
 **SPARQL Query:**
@@ -198,7 +113,7 @@ WHERE {
   FILTER STRSTARTS(STR(?contentModel), "info:fedora/islandora:")
 }
 ```
-## Step 3: Extract PDF and OBJ Data Streams
+## Step 2: Extract PDF and OBJ Data Streams
 **Objective:** Retrieve all PIDs with PDF and OBJ data streams within the collection.
 **Bash Script:**
 Run a script on the Fedora data stream storage location for the collection namespace. Specify the data stream type (PDF or OBJ).
@@ -236,7 +151,7 @@ for dir in $(ls -d ../../datastreamStore/*); do
 done
 date
 ```
-## Step 4: Merge and Update Metadata
+## Step 3: Merge and Update Metadata
 
 **Objective:** Merge the `PDF` and `OBJ` data streams with the comprehensive PIDs metadata (`collection_all_pids.csv`).
 
@@ -254,7 +169,7 @@ A merged CSV containing all PIDs, their hierarchical relationships, and metadata
 - `PID`, `content_model`, `title`, `parent_PID`, `filetype`, `file_size`, `file_path`, `mods_path`, `relzx_path`.
 Run `merge_and_process.py` to create final accounting as single output.
 
-## Step 5: Post-Processing
+## Step 4: Post-Processing
 
 **Objective:** Clean and finalize the merged CSV to ensure only relevant data is retained and formatted correctly.
 
@@ -273,7 +188,7 @@ Save the final file as `collection_final_metadata.csv`.
 A cleaned and finalized CSV containing:
 - `PID`, `content_model`, `title`, `parent_PID`, `filetype`, `file_size (KB)`, `file_path`, `mods_path`, `relzx_path`.
 
-## Step 6: Save and Organize Files
+## Step 5: Save and Organize Files
 
 **Objective:** Save all outputs to a dedicated location for the collection.
 
