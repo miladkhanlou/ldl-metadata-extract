@@ -1,9 +1,9 @@
 import pandas as pd
 
 # Global Variables, CSV file names
-updated_all_pids= "all_pids_with_relationships.csv"
-pdf_datastream_pids = "datastream-data-pdf.csv"
-obj_datastream_pids = "datastream-data-obj.csv"
+updated_all_pids= "all-pids.csv"
+pdf_datastream_pids = "datastream-pdf.csv"
+obj_datastream_pids = "datastream-obj.csv"
 
 # Global functions, Get PID and output directory
 def get_pid_name(all_pids):
@@ -100,27 +100,26 @@ def post_process(df):
     
     # Drop the identified rows
     cleaned_df = df[~((df.duplicated(subset=['PID'], keep='first')) & (df['filetype'] == ""))]
-    return rows_to_drop, cleaned_df
+    return cleaned_df
     
 def merge():
     PID = get_pid_name(updated_all_pids)
     output = outpud_dir(PID)
     merged_df = merge_data(updated_all_pids, pdf_datastream_pids, obj_datastream_pids, PID)
-    to_csv(merged_df, f"output-pre-processed-{output}")
+    to_csv(merged_df, f"collections/{PID}/merged-{output}")
     print(f"Merged data saved as output-pre-processed-{output} ...")
 
 def process():
     PID = get_pid_name(updated_all_pids)
     output = outpud_dir(PID)
-    datastrean_filter_df = filter_datastreams(f"output-pre-processed-{output}")
-    rows_to_drop, post_processed_df = post_process(datastrean_filter_df) # Process the DataFrame to separate rows to drop and cleaned data
-    to_csv(rows_to_drop, f"rows-to-drop-{output}") # Save the rows to be dropped
-    to_csv(post_processed_df, f"output-processed-{output}") # Save the cleaned DataFrame
+    datastrean_filter_df = filter_datastreams(f"collections/{PID}/merged-{output}")
+    post_processed_df = post_process(datastrean_filter_df) # Process the DataFrame to separate rows to drop and cleaned data
+    to_csv(post_processed_df, f"collections/{PID}/{output}") # Save the cleaned DataFrame
     
     print(f"Final Accounting saved as output-processed-{output} ...\n-----------------------------------------------------------------------------------")
 
 if __name__ == "__main__":
-    print("Start Merging and Processing Data...\n-----------------------------------------------------------------------------------")   
+    print("Start Merging and Processing Data...\n")   
     merge()
     process()
     
