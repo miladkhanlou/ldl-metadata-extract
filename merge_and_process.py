@@ -73,7 +73,7 @@ def filter_datastreams(raw_data):
         pid_name = base_row["PID"]
         content_model = base_row["content_model"]
         
-        if content_model != "newspaperIssueCModel" and content_model != "sp_large_image_cmodel" and content_model != "sp-audioCmodel" and content_model != "sp_videoCmodel" and content_model != "sp_remote_resource" :
+        if content_model != "newspaperIssueCModel" and content_model != "sp_large_image_cmodel" and content_model != "sp-audioCmodel" and content_model != "sp_videoCmodel" and content_model != "sp_remote_resource"  and content_model != "sp_pdf" and content_model != "sp-ohCModel":
             base_row["filetype"] = ""
             base_row["file_size"] = ""
             base_row["file_path"] = ""
