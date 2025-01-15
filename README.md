@@ -1,5 +1,5 @@
 # Overview of the pipeline:
-1. **Institution level data(Optional):** Extract Metadata of all Collections within LDL or Institution(e.g lsu)
+1. **Institution level data(Optional):** Extract all collections within an institution.
     - `PID` of the collection
     - Collection `Content model`
     - Collection `Description`
@@ -32,7 +32,46 @@
     
 ---
 # Step-by-Step Instructions for Extracting, Processing, and Organizing Metadata from LDL Collections
-## Step 1: Extract comprehenisive information objects Within a Specific Collection
+## Step 1: Extract all collections within an institution.
+**Objective:** Retrieve all Collection data within a specific collection.
+
+Includes the following columns:
+- `PID`, `content_model`, `Description`, and `title`.
+
+***Note:*** We need to institution name in the query bellow.
+  - Before ``FILTER REGEX(STR(?pid), "louisiananewspapers-")``
+  - After ``FILTER REGEX(STR(?pid), "lsu-")``
+
+```sparql
+PREFIX fedora: <info:fedora/fedora-system:def/model#>
+PREFIX view: <info:fedora/fedora-system:def/view#>
+PREFIX rel: <info:fedora/fedora-system:def/relations-external#>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX premis: <http://www.loc.gov/premis/rdf/v1#>
+
+SELECT DISTINCT 
+    (REPLACE(STR(?pid), "^info:fedora/", "") AS ?PID)
+    ?collection_name
+    ?collection_Description
+    (STRAFTER(STR(?collection_pid), "info:fedora/islandora:") AS ?parent)
+WHERE {
+  ?pid fedora:hasModel ?contentModel .
+  ?pid rel:isMemberOfCollection ?collection_pid .
+  
+  # Filter To get all collections
+  FILTER REGEX(STR(?contentModel), "fedora/islandora:collectionCModel")
+
+  # Filter for the desired namespace
+  FILTER REGEX(STR(?pid), "louisiananewspapers-")
+  
+  # Retrieve additional metadata
+  OPTIONAL { ?pid fedora:label ?collection_name . }
+  OPTIONAL { ?pid dc:description ?collection_Description. }
+}
+```
+## Step 2: Extract comprehenisive information objects Within a Specific Collection
 **Objective:** Retrieve all PIDs within a specific collection, including hierarchical relationships.
 
 **SPARQL Query:**
@@ -42,7 +81,7 @@ Run a comprehensive query for a specific collection, such as `info:fedora/lsu-ag
 - Children of compound objects
 - Newspaper issues, pages, and any nested relationships
 
-Include the following fields:
+Include the following columns:
 - `PID`, `content_model`, `parent_PID`, and `title`.
 
 Save the output to `collection_all_pids.csv`.
