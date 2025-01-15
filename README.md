@@ -167,7 +167,7 @@ Download the output CSVs in this git repository folder.
 
 **Expected Output:**
 CSVs for PDF and OBJ data streams, including:
-- `PID`, `filetype`, `file_size`, `file_path`, `mods_path`, `rdf_path`.
+- `PID`, `filetype`, `file_size`, `institution`,`collection_name`, `file_path`, `mods_path`, `rdf_path`.
 ```sh
 #!/bin/bash
 date
@@ -194,7 +194,8 @@ for dir in $(ls -d ../../datastreamStore/*); do
 done
 date
 ```
-## Step 3: Merge and Update Metadata
+
+## Step 4: Merge and Update Metadata
 
 **Objective:** Merge the `PDF` and `OBJ` data streams with the comprehensive PIDs metadata (`collection_all_pids.csv`).
 
