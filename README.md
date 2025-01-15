@@ -1,5 +1,5 @@
 # Overview of the pipeline:
-1. **Institution and Collection level data(Optional):** Extract Metadata of all Collections within LDL or Institution(e.g lsu)
+1. **Institution level data(Optional):** Extract Metadata of all Collections within LDL or Institution(e.g lsu)
     - `PID` of the collection
     - Collection `Content model`
     - Collection `Description`
