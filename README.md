@@ -5,9 +5,9 @@
     - Collection `Description`
     - Collection `Title`
 2. **Information of All content within Collection**: Extract data about objects
-    - `PIDs` of objects within the collection
+    - `PIDs` of objects
     - `Content model`
-    - parent page(`parent_PID`)
+    - `parent_PID`(parent page)
     - `title`(title of the page).
 3. **Extract Datastream metadata within collcetion**
     - `PID` the object
