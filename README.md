@@ -9,19 +9,23 @@
     - `Content model`
     - `parent_PID`(parent page)
     - `title`(title of the page).
-3. **Extract Datastream metadata within collcetion**
+3. **Run bash scripts to extract datastream metadata**
     - `PID` the object
     - `filetype`
     - `file_size`
     - `file_path`
+   - `institution`
+    - `collection_name`
     - `mods_path`
     - `rdf_path`
-4. **Merge and process (final accounting csv):** merge all PIDs csv (step2) with each csv containging datastream metadata and process the result to filter needed data stream metadata
+4. **Merge and process (final accounting csv):** Merge all data and process the result to a final csv.
     - `PID`
-    - Collection `Content model`
-    - Collection `Title`
+    - `Content model`
+    - `Title`
     - `filetype`
     - `file_size`
+    - `institution`
+    - `collection_name`
     - `file_path`
     - `mods_path`
     - `rdf_path`
