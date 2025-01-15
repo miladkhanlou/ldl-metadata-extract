@@ -35,10 +35,10 @@
 ## Step 1: Extract all collections within an institution.
 **Objective:** Retrieve all Collection data within a specific collection.
 
-Includes the following columns:
+Includes the following data:
 - `PID`, `content_model`, `Description`, and `title`.
 
-***Note:*** We need to institution name in the query bellow.
+***Note:*** We need to change institution name in the query bellow.
   - Before ``FILTER REGEX(STR(?pid), "louisiananewspapers-")``
   - After ``FILTER REGEX(STR(?pid), "lsu-")``
 
@@ -71,8 +71,8 @@ WHERE {
   OPTIONAL { ?pid dc:description ?collection_Description. }
 }
 ```
-## Step 2: Extract comprehenisive information objects Within a Specific Collection
-**Objective:** Retrieve all PIDs within a specific collection, including hierarchical relationships.
+## Step 2: Extract data about objects:
+**Objective:** Retrieve all `PID`s within a specific collection, including hierarchical relationships.
 
 **SPARQL Query:**
 Run a comprehensive query for a specific collection, such as `info:fedora/lsu-ag-agexp:collection`. The query should extract:
@@ -81,14 +81,14 @@ Run a comprehensive query for a specific collection, such as `info:fedora/lsu-ag
 - Children of compound objects
 - Newspaper issues, pages, and any nested relationships
 
-Include the following columns:
+Includes the following data:
 - `PID`, `content_model`, `parent_PID`, and `title`.
 
-Save the output to `collection_all_pids.csv`.
+***Note:*** We need to change `collection name` in the query bellow.
+  - Before ``<info:fedora/louisiananewspapers-orleans:collection>``
+  - After ``<info:fedora/lsu-sc-ajleblanc:collection>``
 
-**Expected Output:**
-A CSV with all PIDs in the collection, including hierarchical relationships and metadata:
-- `PID`, `content_model`, `parent_PID`, and `title`.
+Saves the output to `all_pids.csv` in this git repository folder.
 ```sparql
 PREFIX fedora: <info:fedora/fedora-system:def/model#>
 PREFIX view: <info:fedora/fedora-system:def/view#>
@@ -156,14 +156,13 @@ WHERE {
   FILTER STRSTARTS(STR(?contentModel), "info:fedora/islandora:")
 }
 ```
-## Step 2: Extract PDF and OBJ Data Streams
+## Step 3: Extract PDF and OBJ Datastreams:
 **Objective:** Retrieve all PIDs with PDF and OBJ data streams within the collection.
-**Bash Script:**
-Run a script on the Fedora data stream storage location for the collection namespace. Specify the data stream type (PDF or OBJ).
+**Bash Script:** Run bash scripts on the Fedora datastream storage location (`/data/fedoraData/datastreamStore`)
 
-Save the output to separate CSVs:
-- `collection_pdf_pids.csv` for PDF data streams
-- `collection_obj_pids.csv` for OBJ data streams
+Download the output CSVs in this git repository folder.
+- `datastreams-pdf.csv` for PDF data streams
+- `datastreams-obj.csv` for OBJ data streams
 
 **Expected Output:**
 CSVs for PDF and OBJ data streams, including:
