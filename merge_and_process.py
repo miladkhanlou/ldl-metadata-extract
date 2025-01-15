@@ -13,20 +13,21 @@ def get_pid_name(all_pids):
     institution = PID.split("-")[0]
     return PID, institution
 
+def clean_collection_title(title):
+    return title.replace(':', '--').replace('"', '').replace("'", '').strip()
 
 def create_output_dir(PID, institution):
-    # load all collection data
+    # load all collection data (instituton level directory and it's csv should be created for each collection with sparql query for each collection)
     all_collection_df = pd.read_csv(f"institutions/{institution}/institution_data.csv")
-    # Get the row of our PID
     row = all_collection_df[all_collection_df["PID"] == f"{PID}:collection"]
-    # Get Collection title
-    collection_title = row["collection_name"].values[0]
-    # Create Output directory and make directory for the colleciton with collection title
+    collection_title = clean_collection_title(row["collection_name"].values[0])
+    # Make directory for the each colleciton with collection title
     output_dir = f"institutions/{institution}/{collection_title}"
     os.makedirs(output_dir, exist_ok=True)
     # Construct output file
     output_file = os.path.join(output_dir, f"{PID}.csv")
     return output_file
+
 
 
 def merge_data(all_pids, pdf_pids, obj_pids):
