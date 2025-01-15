@@ -20,7 +20,7 @@ def create_output_dir(PID, institution):
     # Get the row of our PID
     row = all_collection_df[all_collection_df["PID"] == f"{PID}:collection"]
     # Get Collection title
-    collection_title = row["collection_title"].values[0]
+    collection_title = row["collection_name"].values[0]
     # Create Output directory and make directory for the colleciton with collection title
     output_dir = f"institutions/{institution}/{collection_title}"
     os.makedirs(output_dir, exist_ok=True)
