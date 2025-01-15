@@ -22,7 +22,7 @@ def create_output_dir(PID, institution):
     # Get Collection title
     collection_title = row["collection_name"].values[0]
     # Create Output directory and make directory for the colleciton with collection title
-    output_dir = f"institutions/{institution}/{collection_title}"
+    output_dir = f"institutions/{institution}/{collection_name}"
     os.makedirs(output_dir, exist_ok=True)
     # Construct output file
     output_file = os.path.join(output_dir, f"{PID}.csv")
