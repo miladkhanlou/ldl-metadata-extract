@@ -4,8 +4,8 @@
     - Collection `Content model`
     - Collection `Description`
     - Collection `Title`
-2. **Information of All content within Collection**: Extract comprehenisive information objects Within a Specific Collection
-    - `PID` of the collection
+2. **Information of All content within Collection**: Extract data about objects
+    - `PIDs` of objects within the collection
     - PID's `Content model`
     - PID's parent page(`parent_PID`)
     - PID's `title`(title of the page).
