@@ -33,7 +33,7 @@
 ---
 # Step-by-Step Instructions for Extracting, Processing, and Organizing Metadata from LDL Collections
 ## Step 1: Extract all collections within an institution.
-**Objective:** Retrieve all Collection data within a specific collection.
+**Objective:** Retrieve all Collection data within a specific institution.
 
 Includes the following data:
 - `PID`, `content_model`, `Description`, and `title`.
@@ -42,6 +42,7 @@ Includes the following data:
   - Before ``FILTER REGEX(STR(?pid), "louisiananewspapers-")``
   - After ``FILTER REGEX(STR(?pid), "lsu-")``
 
+After runnig the query bellow, save the result as `<INSTITUTION_NAME>-Collections.csv` on L-Drive.
 ```sparql
 PREFIX fedora: <info:fedora/fedora-system:def/model#>
 PREFIX view: <info:fedora/fedora-system:def/view#>
@@ -71,6 +72,7 @@ WHERE {
   OPTIONAL { ?pid dc:description ?collection_Description. }
 }
 ```
+
 ## Step 2: Extract data about objects:
 **Objective:** Retrieve all `PID`s within a specific collection, including hierarchical relationships.
 
@@ -156,18 +158,20 @@ WHERE {
   FILTER STRSTARTS(STR(?contentModel), "info:fedora/islandora:")
 }
 ```
-## Step 3: Extract PDF and OBJ Datastreams:
-**Objective:** Retrieve all PIDs with PDF and OBJ data streams within the collection.
+## Step 3: Extract PDF and OBJ Datastreams data:
+**Objective:** Retrieve data for all PIDs with PDF and OBJ data streams within the collection.
 
 **Bash Script:** Run bash scripts on the Fedora datastream storage location (`/data/fedoraData/datastreamStore`)
 
-Download the output CSVs in this git repository folder.
-- `datastreams-pdf.csv` for PDF data streams
-- `datastreams-obj.csv` for OBJ data streams
+The 2 bash scripts will extract data into two csv files on the server. Then we need to download these csv files into this git repository folder.
+- `datastreams-pdf.csv` for PDF data streams.
+- `datastreams-obj.csv` for OBJ data streams.
 
 **Expected Output:**
 CSVs for PDF and OBJ data streams, including:
-- `PID`, `filetype`, `file_size`, `institution`,`collection_name`, `file_path`, `mods_path`, `rdf_path`.
+- `PID`, `filetype`, `file_size`, `file_path`, `mods_path`, `rdf_path`, `institution`,`collection_name`.
+
+**Note:** Before running each of OBJ and PDF bash scripts, change `<COLLECTION_PID>` to name of collection we want to process.
 ```sh
 #!/bin/bash
 date
@@ -176,7 +180,7 @@ echo -e $headers > "/tmp/outfiles/milad/datastream-pdf.csv"
 
 for dir in $(ls -d ../../datastreamStore/*); do
   echo $dir
-  for file in "$dir"/*{COLLECTION_NAME}*PDF*.0; do
+  for file in "$dir"/*<COLLECTION_PID>%3A*PDF*.0; do
     if [[ -f "$file" ]]; then
       echo $file
       PID=$(echo -e "${file}" | sed 's/info%3Afedora%2F//g' | grep -o "[a-zA-Z0-9-]*%3A[0-9a-zA-Z]*" | sed 's/%3A/:/g')
@@ -197,36 +201,29 @@ date
 
 ## Step 4: Merge and Update Metadata
 
-**Objective:** Merge the `PDF` and `OBJ` data streams with the comprehensive PIDs metadata (`collection_all_pids.csv`).
+**Objective:** Merge the `PDF` and `OBJ` data streams with the comprehensive PIDs metadata (`all_pids.csv`).
 
-**Python Script:**
-Use the merge function in the Python script to:
-- Update the comprehensive PIDs CSV with metadata from PDF and OBJ CSVs.
-- For each PID, add:
-  - `filetype`, `file_size`, `file_path`, `mods_path`, and `relzx_path`.
-- Handle cases where a PID has both PDF and OBJ by creating separate rows for each.
+The `merge-and-process.py` Python script performs the following tasks:
+1. **Normalize datastream CSV column names:**
+   - Normalized column names to: `"PID", "filetype", "file_size", "file_path",  "mods_path", "rdf_path", "institution", "Collection_name"`
 
-Save the updated file as `collection_merged_metadata.csv`.
+2. **Extract institution name and collection details:**
+3. **Build folder structure for final accounting:**
+4. **Merge stage:**
+   - Merges the `datastream-pdf.csv` and `datasteam-obj.csv` with `all-pids.csv` on the `PID` column.
+   - The merged DataFrame includes the following data:
+     - `PID`, `content_model`, `parent_PID`, `title`, `filetype`, `file_size, `file_path`, `mods_path`, `rdf_path`, `institution`, `collection_name`
 
-**Expected Output:**
-A merged CSV containing all PIDs, their hierarchical relationships, and metadata for PDF and OBJ data streams:
-- `PID`, `content_model`, `title`, `parent_PID`, `filetype`, `file_size`, `file_path`, `mods_path`, `relzx_path`.
-Run `merge_and_process.py` to create final accounting as single output.
+5. **Processing stage:**
+     - Empties out the values in `filetype`, `file_size`, and `file_path` columns for objects that do not match the desired content models (e.g., `newspaperIssueCModel`, `sp_large_image_cmodel`).
+     - Converts file sizes to kilobytes.
+     - For compound objects, it adds the following data to the rows for collection objects:
+       - `mods_path`, `rdf_path`, `institution`, `Collection_name`
+     - Identifies and removes duplicate rows where `PID` values are repeated, ensuring only one row with non-empty `filetype` are retained.
 
-## Step 4: Post-Processing
+6. **Final output:**
+   - Saves the final accounting to the designated directory (e.g., `institution/<institutionName>/<collectionTitle>/<collectionName>.csv`).
 
-**Objective:** Clean and finalize the merged CSV to ensure only relevant data is retained and formatted correctly.
-
-**Post-Processing Steps:**
-1. **Filter Out Unnecessary Rows:**
-   - Retain metadata for PDF data streams only if the `content_model` is `newspaperIssue`.
-   - Clear `file_size`, `file_path`, `mods_path`, and `relzx_path` for rows where `content_model` is not `newspaperIssue`.
-2. **Format File Size:**
-   - Convert `file_size` from bytes to kilobytes (divide by 1024).
-3. **Finalize CSV:**
-   - Ensure all rows are updated and ready for export.
-
-Save the final file as `collection_final_metadata.csv`.
 
 **Expected Output:**
 A cleaned and finalized CSV containing:
