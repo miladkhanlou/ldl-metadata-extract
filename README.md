@@ -171,7 +171,7 @@ CSVs for PDF and OBJ data streams, including:
 ```sh
 #!/bin/bash
 date
-headers="PID,filetype,PDF Size,Institution,collection_name,PDF Path,MODS Path,RELS-EXT Path"
+headers="PID,filetype,PDF Size,PDF Path,MODS Path,RELS-EXT Path,Institution,collection_name"
 echo -e $headers > "/tmp/outfiles/milad/datastream-pdf.csv"
 
 for dir in $(ls -d ../../datastreamStore/*); do
@@ -187,7 +187,7 @@ for dir in $(ls -d ../../datastreamStore/*); do
       PDF_path="https://louisianadigitallibrary.org/islandora/object/${PID}/datastream/PDF/download"
       mods_path="https://louisianadigitallibrary.org/islandora/object/${PID}/datastream/MODS/download"
       relsext_path="https://louisianadigitallibrary.org/islandora/object/${PID}/datastream/RELS-EXT/download"
-      line="${PID},${filetype},${PDF_Size},${institution},${collection},${PDF_path},${mods_path},${relsext_path}"
+      line="${PID},${filetype},${PDF_Size},${PDF_path},${mods_path},${relsext_path},${institution},${collection}"
       echo -e $line >> "/tmp/outfiles/milad/datastream-pdf.csv"
     fi
   done
