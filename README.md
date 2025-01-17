@@ -42,7 +42,7 @@ Includes the following data:
   - Before ``FILTER REGEX(STR(?pid), "louisiananewspapers-")``
   - After ``FILTER REGEX(STR(?pid), "lsu-")``
 
-**After runnig the query bellow:**
+**After runnig the Sparql query save and update the institution level data:**
 1. save the result as `<INSTITUTION_NAME>-Collections.csv` on [oneDrive](https://lsumail2.sharepoint.com/:f:/r/sites/Team-LIB/Shared%20Documents/Departments/Technology%20Initiatives/LDL/LDL%20acounting?csf=1&web=1&e=Lfn7h8). 
 2. After processing each Collection, update csv on oneDrive.
 3. We Update L-Drive on a daily basis.
