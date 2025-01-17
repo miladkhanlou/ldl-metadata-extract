@@ -212,7 +212,7 @@ The `merge-and-process.py` Python script performs the following tasks:
 4. **Merge stage:**
    - Merges the `datastream-pdf.csv` and `datasteam-obj.csv` with `all-pids.csv` on the `PID` column.
    - The merged DataFrame includes the following data:
-     - `PID`, `content_model`, `parent_PID`, `title`, `filetype`, `file_size, `file_path`, `mods_path`, `rdf_path`, `institution`, `collection_name`
+     - `PID, content_model, parent_PID, title, filetype, file_size, file_path, mods_path, rdf_path, institution, collection_name`
 
 5. **Processing stage:**
      - Empties out the values in `filetype`, `file_size`, and `file_path` columns for objects that do not match the desired content models (e.g., `newspaperIssueCModel`, `sp_large_image_cmodel`).
