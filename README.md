@@ -229,12 +229,7 @@ The `merge-and-process.py` Python script performs the following tasks:
 A cleaned and finalized CSV containing:
 - `PID`, `content_model`, `title`, `parent_PID`, `filetype`, `file_size (KB)`, `file_path`, `mods_path`, `relzx_path`.
 
-## Step 5: Save and Organize Files
 
-**Objective:** Save all outputs to a dedicated location for the collection.
+## Step 5: Save the collection's final accounting to the L-Drive.
 
-**Process:**
-Copy all relevant CSVs (`all_collections.csv`, `lsu_collections.csv`, `collection_all_pids.csv`, `collection_pdf_pids.csv`, `collection_obj_pids.csv`, `collection_merged_metadata.csv`, `collection_final_metadata.csv`) to the designated L drive or repository.
 
-**Expected Output:**
-A structured and organized folder with all data and metadata for the collection.
