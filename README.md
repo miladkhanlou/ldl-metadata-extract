@@ -42,7 +42,10 @@ Includes the following data:
   - Before ``FILTER REGEX(STR(?pid), "louisiananewspapers-")``
   - After ``FILTER REGEX(STR(?pid), "lsu-")``
 
-After runnig the query bellow, save the result as `<INSTITUTION_NAME>-Collections.csv` on L-Drive.
+**After runnig the query bellow:**
+    * save the result as `<INSTITUTION_NAME>-Collections.csv` on [oneDrive](https://lsumail2.sharepoint.com/:f:/r/sites/Team-LIB/Shared%20Documents/Departments/Technology%20Initiatives/LDL/LDL%20acounting?csf=1&web=1&e=Lfn7h8). 
+    * After processing each Collection update csv on oneDrive
+    * We Update L-Drive on a daily basis.
 ```sparql
 PREFIX fedora: <info:fedora/fedora-system:def/model#>
 PREFIX view: <info:fedora/fedora-system:def/view#>
