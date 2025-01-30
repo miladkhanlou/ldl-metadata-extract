@@ -80,19 +80,30 @@ def to_csv(final_df, output_file):
 
 def filter_datastreams(raw_data):
     output_rows = []
+    allowed_content_models = [
+        "newspaperIssueCModel",
+        "sp_large_image_cmodel",
+        "sp-audioCModel",
+        "sp_videoCModel",
+        "sp_remote_resource",
+        "sp_pdf",
+        "sp-ohCModel",
+        "bookCModel"
+        ]
     for _, row in raw_data.iterrows():
         base_row = row.to_dict()
         parent_pid_name = base_row["parent_PID"]
         pid_name = base_row["PID"]
         content_model = base_row["content_model"]
         
-        if content_model != "newspaperIssueCModel" and content_model != "sp_large_image_cmodel" and content_model != "sp-audioCmodel" and content_model != "sp_videoCmodel" and content_model != "sp_remote_resource"  and content_model != "sp_pdf" and content_model != "sp-ohCModel":
+        if content_model in allowed_content_models and base_row['file_size'] != "":
+            base_row["file_size"] = f"{base_row['file_size'] / 1000}"
+
+        else:
+            # Clear fields only if the content model is not in the allowed list
             base_row["filetype"] = ""
             base_row["file_size"] = ""
             base_row["file_path"] = ""
-            
-        else:
-            base_row["file_size"] = f"{base_row['file_size'] / 1000}Kb"
             
         # fill out data from collection objects:
         if "collection" in parent_pid_name: # create MODS and RDF path for collection PIDs
