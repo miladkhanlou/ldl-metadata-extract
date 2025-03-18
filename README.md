@@ -192,9 +192,7 @@ for dir in $(ls -d ../../datastreamStore/*); do
       filetype=$(file -b --mime-type "$file")
       PDF_Size=$(stat --format="%s" "$file")
       PDF_path="https://louisianadigitallibrary.org/islandora/object/${PID}/datastream/PDF/download"
-      mods_path="https://louisianadigitallibrary.org/islandora/object/${PID}/datastream/MODS/download"
-      relsext_path="https://louisianadigitallibrary.org/islandora/object/${PID}/datastream/RELS-EXT/download"
-      line="${PID},${filetype},${PDF_Size},${PDF_path},${mods_path},${relsext_path},${institution},${collection}"
+      line="${PID},${filetype},${PDF_Size},${PDF_path},${institution},${collection}"
       echo -e $line >> "/tmp/outfiles/milad/datastream-pdf.csv"
     fi
   done
